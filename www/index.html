@@ -563,6 +563,11 @@ function saveAsPNG(){
   if(scaleWrap)scaleWrap.style.transform='none';
   const controls=[...document.querySelectorAll('.pf-controls,.mp-controls,#toolbar')];
   controls.forEach(el=>el.classList.add('export-hide'));
+  /* Wait two animation frames so the browser fully reflows/repaints after
+     removing the scale transform, before html2canvas reads the layout —
+     otherwise it can capture mid-reflow, causing overlapping text and a
+     misplaced signature/stamp. */
+  requestAnimationFrame(()=>{requestAnimationFrame(()=>{
   html2canvas(page,{scale:3,backgroundColor:'#ffffff',useCORS:true,ignoreElements:el=>el.classList?.contains('row-controls')||el.classList?.contains('export-hide')}).then(canvas=>{
     if(scaleWrap)scaleWrap.style.transform=prevTransform;
     controls.forEach(el=>el.classList.remove('export-hide'));
@@ -576,6 +581,7 @@ function saveAsPNG(){
     document.body.classList.remove('exporting');
     alert('PNG export mein error: '+err.message);
   });
+  });});
 }
 function exportAsPDF(){
   /* Browser print dialog provides the native "Save as PDF" option on Android/desktop. */
