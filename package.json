@@ -1,0 +1,17 @@
+{
+  "name": "cd-kp-performance",
+  "version": "1.0.0",
+  "description": "CD KP Performance - DSR and Monthly Progress App",
+  "scripts": {
+    "prebuild": "cp node_modules/html2canvas/dist/html2canvas.min.js www/html2canvas.min.js",
+    "sync": "npm run prebuild && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "html2canvas": "1.4.1"
+  }
+}
