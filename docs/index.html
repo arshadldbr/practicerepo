@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Civil Defence Khyber — DSR & Monthly Progress — v13</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#01643c">
 <script src="html2canvas.min.js"></script>
 <style>
   :root{
@@ -1022,7 +1026,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 </script>
-<script>window.addEventListener('load',function(){loadData();setTimeout(function(){initMonthly();applyScale()},50)});</script>
+<script>window.addEventListener('load',function(){loadData();setTimeout(function(){initMonthly();applyScale()},50);if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}});</script>
 
 <div id="brandingBar"><div><b>Developed by: A.K.A Tech</b> | A Company by Arshad Khan Aastik</div><div><a href="https://wa.me/923149891182" target="_blank">WhatsApp: +92 314 9891182</a><a href="mailto:arshadlaidbeer@gmail.com">arshadlaidbeer@gmail.com</a></div></div></body>
 </html>
