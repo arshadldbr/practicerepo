@@ -151,13 +151,13 @@ font-size:13.5px;margin:4px 0 16px;}
   }
   .header-text-editor:focus,.designation-editor:focus{background:#fff7d6;}
   .signature-stack{display:flex;flex-direction:column;align-items:center;width:245px;}
-  .signature-stack img{width:245px;height:auto;display:block;cursor:pointer;}
+  .signature-stack img{width:245px;height:85px;object-fit:cover;object-position:top;display:block;cursor:pointer;}
   .designation-editor{
     width:245px;text-align:center;font-size:16px;font-family:Arial,"Segoe UI",sans-serif;
     font-weight:500;line-height:1.15;outline:none;cursor:text;margin-top:-2px;
   }
   .monthly-signature-stack{display:flex;flex-direction:column;align-items:center;}
-  .monthly-signature-stack img{width:210px;max-height:100px;object-fit:contain;display:block;cursor:pointer;}
+  .monthly-signature-stack img{width:210px;height:72px;object-fit:cover;object-position:top;display:block;cursor:pointer;}
   .monthly-designation{width:210px;font-size:13px;margin-top:0;}
 
   @media (max-width:600px){
@@ -557,9 +557,10 @@ function getActiveName(){
 /* html2canvas (esp. v1.4.1) has known bugs rendering CSS object-fit,
    causing signature/stamp images to appear shifted or mis-fit inside their
    box. Fix: after html2canvas captures everything else, manually redraw
-   each signature image directly onto the resulting canvas using correct
-   "contain" math, based on the element's real on-page position — this
-   bypasses html2canvas's own (buggy) handling of that image entirely. */
+   each signature image directly onto the resulting canvas — matching the
+   live page's object-fit:cover + object-position:top (crop to the top
+   portion only, so any baked-in printed text below the pen signature stays
+   hidden, same as in the browser) — bypassing html2canvas's own handling. */
 function redrawSignatureOverlay(canvas, page, scale){
   const ctx=canvas.getContext('2d');
   const pageRect=page.getBoundingClientRect();
@@ -572,12 +573,19 @@ function redrawSignatureOverlay(canvas, page, scale){
     if(boxW<=0||boxH<=0){resolve();return;}
     const im=new Image();
     im.onload=()=>{
-      const imgRatio=im.naturalWidth/im.naturalHeight, boxRatio=boxW/boxH;
-      let drawW,drawH;
-      if(imgRatio>boxRatio){drawW=boxW;drawH=boxW/imgRatio;}else{drawH=boxH;drawW=boxH*imgRatio;}
-      const dx=boxX+(boxW-drawW)/2, dy=boxY+(boxH-drawH)/2;
+      /* cover: scale up until both dimensions fill the box, then crop
+         excess. object-position:top keeps horizontal centering but pins
+         the top edge instead of centering vertically. */
+      const s=Math.max(boxW/im.naturalWidth, boxH/im.naturalHeight);
+      const drawW=im.naturalWidth*s, drawH=im.naturalHeight*s;
+      const dx=boxX+(boxW-drawW)/2, dy=boxY;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(boxX,boxY,boxW,boxH);
+      ctx.clip();
       ctx.clearRect(boxX,boxY,boxW,boxH);
       ctx.drawImage(im,dx,dy,drawW,drawH);
+      ctx.restore();
       resolve();
     };
     im.onerror=resolve;
@@ -666,9 +674,9 @@ function setDateTodayAll(){
 #weeklyMediaPage,#fieldVisitPage{width:794px;min-height:1123px;background:#fff;padding:28px 38px 40px;box-sizing:border-box;box-shadow:0 6px 24px rgba(0,0,0,.5);font-family:Arial,"Times New Roman",sans-serif;color:#111;position:relative}
 #fieldVisitPage{font-family:Arial,sans-serif}
 .pf-controls{display:flex;gap:8px;margin-bottom:12px}.pf-controls button{padding:7px 11px;border:1px solid #777;border-radius:4px;background:#eee;font-weight:700}
-.wm-head{text-align:center;font-weight:700;font-size:17px;line-height:1.25;margin-bottom:10px}.wm-head div[contenteditable]{outline:1px dashed transparent}.wm-head div[contenteditable]:focus{outline:1px dashed #777}.wm-subtitle{font-size:12px;font-style:italic;font-weight:400;margin-top:3px}.wm-note{font-size:11px;margin:4px 8px 7px;line-height:1.35}.wm-subheading{font-size:12px;font-weight:700;margin:5px 8px}.wm-footer{width:100%;border-collapse:collapse;margin-top:28px;font-size:11px}.wm-footer td{border:1px solid #aaa;padding:7px;vertical-align:middle;height:34px}.wm-footer td:first-child{width:50%}.wm-footer td:last-child{width:50%}.wm-checkline{height:18px;border-bottom:1px solid #555;width:70%;margin:0 auto}.wm-signline{display:flex;align-items:center;gap:7px;min-height:55px}.wm-signline img{width:120px;height:58px;object-fit:contain;cursor:pointer}.wm-director{text-align:center;font-weight:700}
+.wm-head{text-align:center;font-weight:700;font-size:17px;line-height:1.25;margin-bottom:10px}.wm-head div[contenteditable]{outline:1px dashed transparent}.wm-head div[contenteditable]:focus{outline:1px dashed #777}.wm-subtitle{font-size:12px;font-style:italic;font-weight:400;margin-top:3px}.wm-note{font-size:11px;margin:4px 8px 7px;line-height:1.35}.wm-subheading{font-size:12px;font-weight:700;margin:5px 8px}.wm-footer{width:100%;border-collapse:collapse;margin-top:28px;font-size:11px}.wm-footer td{border:1px solid #aaa;padding:7px;vertical-align:middle;height:34px}.wm-footer td:first-child{width:50%}.wm-footer td:last-child{width:50%}.wm-checkline{height:18px;border-bottom:1px solid #555;width:70%;margin:0 auto}.wm-signline{display:flex;align-items:center;gap:7px;min-height:55px}.wm-signline img{width:120px;height:42px;object-fit:cover;object-position:top;cursor:pointer}.wm-director{text-align:center;font-weight:700}
 .wm-meta{display:flex;justify-content:space-between;border-top:2px solid #111;border-bottom:2px solid #111;margin-top:8px;padding:5px 0;font-size:12px}.wm-subject{font-size:12px;margin:12px 0 8px}.pf-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}.pf-table th,.pf-table td{border:1px solid #555;padding:4px 5px;vertical-align:top;overflow-wrap:anywhere;min-height:18px}.pf-table th{font-weight:700;text-align:center;background:#f1f1f1}.wm-info td:nth-child(odd){font-weight:700;width:17%;background:#f4f4f4}.wm-info td:nth-child(even){width:33%}.pf-section{margin-top:9px}.pf-section h3{font-size:12px;margin:0;padding:4px 5px;border:1px solid #333;border-bottom:0;background:#eee}.wm-bullets{font-size:11px;line-height:1.55}.wm-bullets div{margin:7px 0}.pf-sign{margin-top:35px;display:flex;justify-content:flex-end;align-items:flex-end;gap:8px;font-size:11px}.pf-sign img{width:150px;height:70px;object-fit:contain;cursor:pointer}
-.fv-title{text-align:center;font-weight:800;font-size:18px;line-height:1.35;margin:8px 0 24px}.fv-title div:last-child{font-size:17px}.fv-section-title{font-size:14px;margin:18px 0 5px;border-bottom:2px solid #222;padding-bottom:4px}.fv-details td:first-child{width:28%;font-weight:700;background:#e9eef5}.fv-details td:last-child{font-size:13px;font-weight:600}.fv-contact-row td{height:26px}.fv-sign{margin-top:12px;display:flex;align-items:flex-end;gap:8px;font-size:12px;font-weight:700}.fv-sign img{width:140px;height:85px;object-fit:contain;cursor:pointer}
+.fv-title{text-align:center;font-weight:800;font-size:18px;line-height:1.35;margin:8px 0 24px}.fv-title div:last-child{font-size:17px}.fv-section-title{font-size:14px;margin:18px 0 5px;border-bottom:2px solid #222;padding-bottom:4px}.fv-details td:first-child{width:28%;font-weight:700;background:#e9eef5}.fv-details td:last-child{font-size:13px;font-weight:600}.fv-contact-row td{height:26px}.fv-sign{margin-top:12px;display:flex;align-items:flex-end;gap:8px;font-size:12px;font-weight:700}.fv-sign img{width:140px;height:48px;object-fit:cover;object-position:top;cursor:pointer}
 @media(max-width:600px){#weeklyMediaPage,#fieldVisitPage{width:calc(100vw - 20px);padding:18px 10px}.pf-table{font-size:9px}.wm-head{font-size:13px}.fv-title{font-size:14px}.fv-title div:last-child{font-size:13px}}
 /* Print/PDF: never hard-code which proforma shows. Only the currently active
    stage has display!=none (set by showPage()); everything else is already
