@@ -554,6 +554,38 @@ function getActiveName(){
   if(getComputedStyle(document.getElementById('fieldVisitStage')).display!=='none') return 'Field_Visit_Proforma';
   return 'DSR_Khyber';
 }
+/* html2canvas (esp. v1.4.1) has known bugs rendering CSS object-fit,
+   causing signature/stamp images to appear shifted or mis-fit inside their
+   box. Fix: after html2canvas captures everything else, manually redraw
+   each signature image directly onto the resulting canvas using correct
+   "contain" math, based on the element's real on-page position — this
+   bypasses html2canvas's own (buggy) handling of that image entirely. */
+function redrawSignatureOverlay(canvas, page, scale){
+  const ctx=canvas.getContext('2d');
+  const pageRect=page.getBoundingClientRect();
+  const sigImgs=page.querySelectorAll('.wm-signline img,.fv-sign img,.signature-stack img,.monthly-signature-stack img');
+  const jobs=[...sigImgs].map(imgEl=>new Promise(resolve=>{
+    if(!imgEl.src || imgEl.offsetParent===null){resolve();return;}
+    const rect=imgEl.getBoundingClientRect();
+    const boxX=(rect.left-pageRect.left)*scale, boxY=(rect.top-pageRect.top)*scale;
+    const boxW=rect.width*scale, boxH=rect.height*scale;
+    if(boxW<=0||boxH<=0){resolve();return;}
+    const im=new Image();
+    im.onload=()=>{
+      const imgRatio=im.naturalWidth/im.naturalHeight, boxRatio=boxW/boxH;
+      let drawW,drawH;
+      if(imgRatio>boxRatio){drawW=boxW;drawH=boxW/imgRatio;}else{drawH=boxH;drawW=boxH*imgRatio;}
+      const dx=boxX+(boxW-drawW)/2, dy=boxY+(boxH-drawH)/2;
+      ctx.clearRect(boxX,boxY,boxW,boxH);
+      ctx.drawImage(im,dx,dy,drawW,drawH);
+      resolve();
+    };
+    im.onerror=resolve;
+    im.src=imgEl.src;
+  }));
+  return Promise.all(jobs);
+}
+
 function saveAsPNG(){
   const page=getActiveExportPage();
   if(!page || typeof html2canvas==='undefined'){alert('PNG export library available nahi hai.');return;}
@@ -568,7 +600,8 @@ function saveAsPNG(){
      otherwise it can capture mid-reflow, causing overlapping text and a
      misplaced signature/stamp. */
   requestAnimationFrame(()=>{requestAnimationFrame(()=>{
-  html2canvas(page,{scale:3,backgroundColor:'#ffffff',useCORS:true,ignoreElements:el=>el.classList?.contains('row-controls')||el.classList?.contains('export-hide')}).then(canvas=>{
+  html2canvas(page,{scale:3,backgroundColor:'#ffffff',useCORS:true,ignoreElements:el=>el.classList?.contains('row-controls')||el.classList?.contains('export-hide')}).then(async canvas=>{
+    await redrawSignatureOverlay(canvas,page,3);
     if(scaleWrap)scaleWrap.style.transform=prevTransform;
     controls.forEach(el=>el.classList.remove('export-hide'));
     document.body.classList.remove('exporting');
