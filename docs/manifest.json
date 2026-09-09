@@ -1,0 +1,16 @@
+{
+  "name": "CD KP Performance",
+  "short_name": "CDKP Performance",
+  "description": "DSR and Monthly Progress reporting app for Civil Defence, District Khyber",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#01643c",
+  "theme_color": "#01643c",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
