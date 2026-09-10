@@ -744,7 +744,7 @@ document.addEventListener('input',e=>{if(e.target.closest('#weeklyMediaPage,#fie
   <div class="mp-title">MONTHLY PROGRESS REPORT</div>
   <div class="mp-instructions"><b>Instructions:</b><br>Fill in ONLY the yellow boxes. Write the number for each item. If an activity was not done, write 0 — do not leave it blank.</div>
   <div class="mp-example">Example — this is how a filled row should look (for your reference only, do not edit):<br><span>Petrol Pumps Inspected</span><b>14</b></div>
-  <div class="mp-controls"><label>District: <input id="mpDistrict" value="Khyber" readonly></label><label>Month: <input id="monthPicker" type="month" onchange="renderMonthly()"></label><button class="primary" onclick="downloadMonthlyXLSX()">⬇ Download XLSX</button><button id="mpResetBtn" onclick="resetMonthlyCycle()" style="border-color:#b32020;color:#b32020">♻️ Reset This Month</button><button onclick="showPage('dsr')">↩ Back to DSR</button></div>
+  <div class="mp-controls"><label>District: <input id="mpDistrict" value="Khyber"></label><label>Month: <input id="monthPicker" type="month" onchange="renderMonthly()"></label><button class="primary" onclick="downloadMonthlyXLSX()">⬇ Download XLSX</button><button id="mpResetBtn" onclick="resetMonthlyCycle()" style="border-color:#b32020;color:#b32020">♻️ Reset This Month</button><button onclick="showPage('dsr')">↩ Back to DSR</button></div>
   <div class="mp-status" id="dayStatus"></div>
   <div id="monthlyFullForm"></div>
 <div class="doc-watermark">A.K.A Tech</div>
